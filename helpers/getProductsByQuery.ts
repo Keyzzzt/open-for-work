@@ -58,18 +58,12 @@ export const getProductsByQuery = async ({
         if (currentCategory === 'All') {
           const count = await prismaClient.product.findMany({
             where: {
-              AND: [
-                { title: { contains: search, mode: 'insensitive' } },
-                { isArchived: false },
-              ],
+              AND: [{ title: { contains: search } }, { isArchived: false }],
             },
           })
           const products = await prismaClient.product.findMany({
             where: {
-              AND: [
-                { title: { contains: search, mode: 'insensitive' } },
-                { isArchived: false },
-              ],
+              AND: [{ title: { contains: search } }, { isArchived: false }],
             },
             include: {
               category: true,
@@ -88,7 +82,7 @@ export const getProductsByQuery = async ({
           const count = await prismaClient.product.findMany({
             where: {
               AND: [
-                { title: { contains: search, mode: 'insensitive' } },
+                { title: { contains: search } },
                 { category: { title: currentCategory } },
                 { isArchived: false },
               ],
@@ -97,7 +91,7 @@ export const getProductsByQuery = async ({
           const products = await prismaClient.product.findMany({
             where: {
               AND: [
-                { title: { contains: search, mode: 'insensitive' } },
+                { title: { contains: search } },
                 { category: { title: currentCategory } },
                 { isArchived: false },
               ],
@@ -123,18 +117,12 @@ export const getProductsByQuery = async ({
           if (currentCategory === 'All') {
             const count = await prismaClient.product.findMany({
               where: {
-                AND: [
-                  { title: { contains: search, mode: 'insensitive' } },
-                  { isArchived: false },
-                ],
+                AND: [{ title: { contains: search } }, { isArchived: false }],
               },
             })
             const products = await prismaClient.product.findMany({
               where: {
-                AND: [
-                  { title: { contains: search, mode: 'insensitive' } },
-                  { isArchived: false },
-                ],
+                AND: [{ title: { contains: search } }, { isArchived: false }],
               },
               include: {
                 category: true,
@@ -152,7 +140,7 @@ export const getProductsByQuery = async ({
             const count = await prismaClient.product.findMany({
               where: {
                 AND: [
-                  { title: { contains: search, mode: 'insensitive' } },
+                  { title: { contains: search } },
                   { category: { title: currentCategory } },
                   { isArchived: false },
                 ],
@@ -161,7 +149,7 @@ export const getProductsByQuery = async ({
             const products = await prismaClient.product.findMany({
               where: {
                 AND: [
-                  { title: { contains: search, mode: 'insensitive' } },
+                  { title: { contains: search } },
                   { category: { title: currentCategory } },
                   { isArchived: false },
                 ],

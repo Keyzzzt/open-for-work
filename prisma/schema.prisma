@@ -1,0 +1,500 @@
+
+// We can have multiple generators
+generator client {
+  provider = "prisma-client-js"
+  }
+
+// We can have only one datasource
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+  relationMode  = "prisma"
+}
+
+model User {
+  id               String   @id @default(uuid())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  name             String   @unique
+  email            String   @unique
+  hashedPassword   String
+  active          Boolean @default(false)
+}
+
+model Order {
+  id             String  @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  city           String
+  phone          String
+  address        String
+  postalCode     String
+  additionalInfo String?
+  isPaid         Boolean @default(false)
+  isDelivered    Boolean @default(false)
+  ShippingPrice  Float
+  totalPrice     Float
+
+  orderItems OrderItem[]
+}
+
+model OrderItem {
+  id String @id @default(uuid())
+
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id])
+  productId String
+  product   Product @relation("OerderItemToProduct", fields: [productId], references: [id])
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+model Product {
+  id           String   @id @default(uuid())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  title        String @db.Text
+  description  String @db.Text
+  shippingSize String @default("small")
+  price        Int
+  countInStock Int
+  isFeatured   Boolean  @default(false)
+  isArchived   Boolean  @default(false)
+
+  orderItems OrderItem[] @relation("OerderItemToProduct")
+  images Image[] @relation("ImageToProduct")
+  categoryId String
+  category   Category @relation("CategoryToProduct", fields: [categoryId], references: [id])
+
+  // hasColors Boolean @default(false)
+  // hasSizes Boolean @default(false)
+  // brand        String?
+  // rating: 5,
+  // reviewCount: 38
+  // countInFavorite Int
+  // viewCount     Int // This should not be incremented when admin viewed
+  // soldCount     Int
+  // description2      String?
+  // weight            String?
+  // averageRating     Float?
+  // materials         String
+  // whatShouldYouKnow String?
+  // isNewProduct      Boolean  @default(true)
+  // careInstructions  String?
+  // isDirty Boolean @default(false) // When product is created, it will be marked as new, until admin will open it
+
+  // colorId String
+  // color   Color  @relation(fields: [colorId], references: [id])
+
+  // sizeId String
+  // size   Size   @relation(fields: [sizeId], references: [id])
+}
+
+model Category {
+  id    String @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title String @unique
+  description String @db.Text
+
+  products Product[] @relation("CategoryToProduct")
+}
+
+model Image {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  url       String
+  public_id String
+
+  productId String?
+  product   Product? @relation("ImageToProduct", fields: [productId], references: [id], onDelete: Cascade)
+
+  aboutHeroId String?
+  aboutHero   AboutHero? @relation("AboutSectionToImage", fields: [aboutHeroId], references: [id])
+
+  aboutPeopleId String?
+  aboutPeople   AboutTeam? @relation("AboutSectionToImage", fields: [aboutPeopleId], references: [id])
+
+  aboutPartnersId String?
+  aboutPartners   AboutPartners? @relation("AboutPartnersToImage", fields: [aboutPartnersId], references: [id])
+
+  aboutJobsId String?
+  aboutJobs   AboutVacancies? @relation("AboutJobsToJobItem", fields: [aboutJobsId], references: [id])
+
+  @@index([productId])
+
+}
+
+model ShippingCompany {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name          String
+  email         String
+  phone         String
+
+  smallSize ShippingSize[]
+
+}
+
+model ShippingSize {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  maxLength Float
+  maxWidth  Float
+  maxHeight Float
+  maxWeight Float
+  price     Float
+
+  companyId String @unique
+  company   ShippingCompany @relation(fields: [companyId], references: [id])
+}
+
+// model LockerParcel {
+//     id        String   @id @default(uuid())
+//     maxWeight Float
+//     maxHeight Int
+//     maxWidth  Int
+//     maxLength Int
+//     createdAt DateTime @default(now())
+//     updatedAt DateTime @updatedAt
+// }
+
+model Config {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  taxRate Int @default(20)
+  // subscribers - Array of emails
+  // socials - page with most popular social media: enable and provide link to social page
+  // recommendations - page with recommendations
+  // copyrights - All texts that are copyright and editable
+  // export db data to a file
+
+}
+
+model FaqPage {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title String @db.Text
+  description String @db.Text
+  disabled Boolean @default(false)
+
+  faqItems FaqItem[] @relation("FaqPageToFaqItem")
+
+}
+
+model FaqItem {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  question String @db.Text
+  answer String @db.Text
+
+  faqPageId String
+  faqPage   FaqPage @relation("FaqPageToFaqItem", fields: [faqPageId], references: [id], onDelete: Cascade)
+
+  categoryId String
+  category   FaqCategory @relation("FaqItemToFaqCategory", fields: [categoryId], references: [id])
+
+}
+
+model FaqCategory {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title String @unique
+  faqItems FaqItem[] @relation("FaqItemToFaqCategory")
+}
+
+model AboutHero {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title String @db.Text
+  description String @db.Text
+  disabled Boolean @default(false)
+
+  images Image[] @relation("AboutSectionToImage")
+}
+
+model AboutTimeline {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  mainTitle String @db.Text
+  disabled Boolean @default(false)
+
+  date1 String @db.Text
+  dateTime1 String @db.Text
+  title1 String @db.Text
+  description1 String @db.Text
+  disabled1 Boolean  @default(false)
+
+  date2 String @db.Text
+  dateTime2 String @db.Text
+  title2 String @db.Text
+  description2 String @db.Text
+  disabled2 Boolean @default(false)
+
+  date3 String @db.Text
+  dateTime3 String @db.Text
+  title3 String @db.Text
+  description3 String @db.Text
+  disabled3 Boolean @default(false)
+
+  date4 String @db.Text
+  dateTime4 String @db.Text
+  title4 String @db.Text
+  description4 String @db.Text
+  disabled4 Boolean @default(false)
+}
+
+model AboutMission {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title String @db.Text
+  description1 String @db.Text
+  description2 String @db.Text
+  description3 String @db.Text
+  goalTitle1 String @db.Text
+  goalDescription1 String @db.Text
+  goalTitle2 String @db.Text
+  goalDescription2 String @db.Text
+  goalTitle3 String @db.Text
+  goalDescription3 String @db.Text
+  disabled Boolean @default(false)
+}
+
+model AboutTeam {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title String @db.Text
+  description1 String @db.Text
+  description2 String @db.Text
+  disabled Boolean @default(false)
+
+  images Image[] @relation("AboutSectionToImage")
+}
+
+model AboutValues {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title String @db.Text
+  description String @db.Text
+  disabled Boolean @default(false)
+
+  title1 String @db.Text
+  description1 String @db.Text
+  disabled1 Boolean @default(false)
+
+  title2 String @db.Text
+  description2 String @db.Text
+  disabled2 Boolean @default(false)
+
+  title3 String @db.Text
+  description3 String @db.Text
+  disabled3 Boolean @default(false)
+}
+
+model AboutPartners {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title String @db.Text
+  disabled Boolean @default(false)
+
+  images Image[] @relation("AboutPartnersToImage")
+}
+
+model AboutStatistics {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title String @db.Text
+  description String @db.Text
+  disabled Boolean @default(false)
+
+  result1 String @db.Text
+  title1 String @db.Text
+  description1 String @db.Text
+  disabled1 Boolean @default(false)
+
+  result2 String @db.Text
+  title2 String @db.Text
+  description2 String @db.Text
+  disabled2 Boolean @default(false)
+
+  result3 String @db.Text
+  title3 String @db.Text
+  description3 String @db.Text
+  disabled3 Boolean @default(false)
+}
+
+model AboutVacancies {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title String @db.Text
+  description String @db.Text
+  disabled Boolean @default(false)
+
+  images Image[] @relation("AboutJobsToJobItem")
+
+  title1 String @db.Text
+  description1 String @db.Text
+  salary1 String @db.Text
+  city1 String @db.Text
+  disabled1 Boolean @default(false)
+
+  title2 String @db.Text
+  description2 String @db.Text
+  salary2 String @db.Text
+  city2 String @db.Text
+  disabled2 Boolean @default(false)
+
+  title3 String @db.Text
+  description3 String @db.Text
+  salary3 String @db.Text
+  city3 String @db.Text
+  disabled3 Boolean @default(false)
+}
+
+model BlogPage {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title String @db.Text
+  description String @db.Text
+  disabled Boolean @default(false)
+  isAboutSectionDisabled Boolean @default(false)
+  isLandingSectionDisabled Boolean @default(false)
+
+  blogItems BlogItem[] @relation("BlogToBlogItems")
+
+}
+
+model BlogItem {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title String @db.Text
+  description String @db.Text
+  isFeatured Boolean @default(false)
+  disabled Boolean @default(false)
+
+  blogPageId String
+  blogPage   BlogPage @relation("BlogToBlogItems", fields: [blogPageId], references: [id], onDelete: Cascade)
+
+  url String?
+  public_id String?
+
+  paragraphs Paragraph[] @relation("ParagraphToBlogItem")
+}
+
+model Paragraph {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  type String
+  title String? @db.Text
+  content String? @db.Text
+  url String?
+  public_id String?
+
+  blogItemId String
+  blogItem   BlogItem @relation("ParagraphToBlogItem", fields: [blogItemId], references: [id], onDelete: Cascade)
+
+}
+
+
+model Social {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title String @db.Text
+  url String?
+}
+
+
+model LandingFeaturedProducts {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title String @db.Text
+  linkTitle String @db.Text
+  disabled Boolean @default(false)
+}
+
+model LandingTestimonials {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title String @db.Text
+  disabled Boolean @default(false)
+  items TestimonialItem[] @relation("TestimonialsToItem")
+
+}
+
+model TestimonialItem {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  author String @db.Text
+  content String @db.Text
+  disabled Boolean @default(false)
+  featured Boolean @default(false)
+
+  landingTestimonialsId String
+  landingTestimonials   LandingTestimonials @relation("TestimonialsToItem", fields: [landingTestimonialsId], references: [id], onDelete: Cascade)
+
+}
+
+model LandingSale {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title String @db.Text
+  linkTitle String @db.Text
+  description String @db.Text
+  disabled Boolean @default(false)
+
+
+}
+
+
+

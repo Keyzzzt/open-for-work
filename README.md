@@ -1,8 +1,8 @@
 # Next.js app
 
-Source code 👉 https://github.com/Keyzzzt/open-for-work
-DEMO Frontend 👉 https://open-for-work.vercel.app/
-DEMO CMS 👉 https://open-for-work.vercel.app/dashboard
+## Source code 👉 https://github.com/Keyzzzt/open-for-work
+## DEMO Frontend 👉 https://open-for-work.vercel.app/
+## DEMO CMS 👉 https://open-for-work.vercel.app/dashboard
 
 ## Credentials
 Email:  frontend@hire.me

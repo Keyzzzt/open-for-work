@@ -98,7 +98,7 @@ export const Register: FC<Props> = ({ isRegistered }) => {
                 type='email'
                 name='email'
                 label='Email'
-                defaultValue='a@a.com'
+                defaultValue='frontend@hire.me'
               />
             </div>
 
@@ -110,7 +110,7 @@ export const Register: FC<Props> = ({ isRegistered }) => {
                 type='text'
                 name='name'
                 label='Name'
-                defaultValue='zzz'
+                defaultValue='Admin'
               />
             </div>
 
@@ -122,7 +122,7 @@ export const Register: FC<Props> = ({ isRegistered }) => {
                 type='text'
                 name='password'
                 label='Password'
-                defaultValue='zzz'
+                defaultValue='frontend@hire.me'
               />
             </div>
 
@@ -134,7 +134,7 @@ export const Register: FC<Props> = ({ isRegistered }) => {
                 type='text'
                 name='confirmPassword'
                 label='Confirm'
-                defaultValue='zzz'
+                defaultValue='frontend@hire.me'
               />
             </div>
             <CustomButton
